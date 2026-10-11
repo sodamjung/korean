@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>훈민정음 비밀의 문: 한글 창제의 신비</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts for Korean Traditional feel -->
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Nanum+Gothic:wght@400;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Nanum Gothic', sans-serif;
+            background-color: #f7f3e9;
+            background-image: radial-gradient(#e5d9c5 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .hanji-card {
+            background: #fffdf7;
+            border: 2px solid #d4c39c;
+            box-shadow: 0 10px 25px -5px rgba(120, 80, 20, 0.15);
+        }
+        .font-batang {
+            font-family: 'Gowun Batang', serif;
+        }
+        .seal-stamp {
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn {
+            0% { transform: scale(0) rotate(-20deg); opacity: 0; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between text-gray-800 p-4 sm:p-6">
+
+    <!-- Header -->
+    <header class="max-w-4xl mx-auto w-full text-center my-4">
+        <div class="inline-block bg-amber-800 text-amber-50 px-4 py-1 rounded-full text-sm font-bold mb-2 shadow-sm">
+            👑 초등 5학년을 위한 세종대왕의 한글 탐험
+        </div>
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-amber-950 font-batang tracking-wide">
+            훈민정음 비밀의 문
+        </h1>
+        <p class="text-gray-600 text-sm mt-1">세종대왕님이 숨겨놓은 3가지 과학적 비밀을 풀어 해례본 완성하기!</p>
+    </header>
+
+    <!-- Main Game Container -->
+    <main class="max-w-3xl mx-auto w-full flex-1 flex flex-col justify-center">
+        <!-- Progress Bar -->
+        <div class="mb-6 bg-amber-100 rounded-full h-4 p-1 border border-amber-300 relative">
+            <div id="progress-bar" class="bg-amber-600 h-full rounded-full transition-all duration-500 w-0"></div>
+            <div class="absolute inset-0 flex justify-between items-center px-4 text-xs font-bold text-amber-900">
+                <span>1단계: 자음의 비밀</span>
+                <span>2단계: 모음의 신비</span>
+                <span>3단계: 받침의 지혜</span>
+            </div>
+        </div>
+
+        <!-- Score Bar (Top Right Badge) -->
+        <div class="flex justify-between items-center mb-4 px-2">
+            <div class="text-xs font-bold text-amber-900 bg-amber-200/60 px-3 py-1 rounded-full border border-amber-300">
+                🏆 현재 점수: <span id="live-score" class="text-amber-800 font-black text-sm">0</span> / 100점
+            </div>
+            <div id="stage-indicator" class="text-xs font-bold text-amber-700">탐험 준비 중</div>
+        </div>
+
+        <!-- Stage 0: Intro Screen -->
+        <div id="stage-0" class="hanji-card rounded-2xl p-6 sm:p-10 text-center relative overflow-hidden">
+            <div class="text-6xl mb-4">📜</div>
+            <h2 class="text-2xl font-bold font-batang text-amber-900 mb-3">집현전 학사가 되어 보아라!</h2>
+            <p class="text-gray-700 leading-relaxed mb-6">
+                조선 시대, 세종대왕님께서 백성을 위해 새로 만든 <span class="font-bold text-amber-800">훈민정음</span>!<br>
+                한글이 왜 세계에서 가장 위대한 글자인지 3가지 단계를 통해 알아보고<br>
+                <span class="font-bold text-red-700">'훈민정음 해례본의 인장'</span>을 완성해 보세요!
+            </p>
+            <button onclick="startGame()" class="w-full sm:w-auto bg-amber-700 hover:bg-amber-800 text-white font-bold text-lg px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition transform hover:-translate-y-0.5">
+                <i class="fa-solid fa-play mr-2"></i>탐험 시작하기
+            </button>
+        </div>
+
+        <!-- Stage 1: Consonant Shapes Game -->
+        <div id="stage-1" class="hanji-card rounded-2xl p-6 sm:p-8 hidden">
+            <div class="flex justify-between items-center border-b pb-3 mb-4 border-amber-200">
+                <span class="bg-amber-200 text-amber-900 text-xs font-bold px-3 py-1 rounded-full">1단계: 자음의 원리</span>
+                <span class="text-sm font-semibold text-gray-600">발음 기관의 모양을 본뜬 자음!</span>
+            </div>
+            <p class="text-center font-bold text-lg mb-4 text-amber-900">
+                👉 왼쪽의 <span class="text-amber-700">기본 자음</span>을 발음할 때 모앙이 닮은 <span class="text-amber-700">발음 기관</span>을 연결해 보세요!
+            </p>
+
+            <div id="consonant-game" class="grid grid-cols-1 sm:grid-cols-2 gap-4 my-6">
+                <!-- Left: Consonants -->
+                <div class="space-y-3" id="consonant-list">
+                    <!-- Dynamic rendering -->
+                </div>
+                <!-- Right: Organs -->
+                <div class="space-y-3" id="organ-list">
+                    <!-- Dynamic rendering -->
+                </div>
+            </div>
+
+            <div id="stage1-feedback" class="hidden my-3 p-3 bg-amber-50 rounded-lg border border-amber-200 text-sm text-center"></div>
+
+            <button id="stage1-next-btn" onclick="checkStage1()" class="w-full bg-amber-700 hover:bg-amber-800 text-white font-bold py-3 rounded-xl transition">
+                정답 확인하기
+            </button>
+        </div>
+
+        <!-- Stage 2: Vowel Combination Game -->
+        <div id="stage-2" class="hanji-card rounded-2xl p-6 sm:p-8 hidden">
+            <div class="flex justify-between items-center border-b pb-3 mb-4 border-amber-200">
+                <span class="bg-amber-200 text-amber-900 text-xs font-bold px-3 py-1 rounded-full">2단계: 모음의 신비</span>
+                <span class="text-sm font-semibold text-gray-600">천·지·인 (하늘, 땅, 사람)</span>
+            </div>
+
+            <div class="bg-amber-50 p-4 rounded-xl mb-4 border border-amber-200 text-center text-sm">
+                <span class="font-bold text-amber-900">ㆍ (하늘 둥근 모양)</span> + 
+                <span class="font-bold text-amber-900">ㅡ (땅 평평한 모양)</span> + 
+                <span class="font-bold text-amber-900">ㅣ (서 있는 사람)</span><br>
+                단 3가지 기호로 세상 모든 소리를 만들어 내는 모음의 원리!
+            </div>
+
+            <div class="text-center my-4">
+                <p class="text-gray-600 text-sm mb-1">만들어야 할 목표 모음</p>
+                <div id="target-vowel" class="text-5xl font-extrabold text-amber-900 font-batang my-2">ㅏ</div>
+                <p id="vowel-hint" class="text-xs text-amber-700">사람(ㅣ)의 오른쪽에 하늘(ㆍ)이 있는 모양!</p>
+            </div>
+
+            <!-- Combination Sandbox -->
+            <div class="flex justify-center items-center gap-3 my-6">
+                <button onclick="addVowelElement('ㆍ')" class="w-16 h-16 bg-amber-100 hover:bg-amber-200 border-2 border-amber-400 rounded-2xl text-2xl font-bold text-amber-950 flex flex-col items-center justify-center shadow-sm active:scale-95 transition">
+                    <span>ㆍ</span>
+                    <span class="text-[10px] text-amber-700 font-normal">하늘</span>
+                </button>
+                <button onclick="addVowelElement('ㅡ')" class="w-16 h-16 bg-amber-100 hover:bg-amber-200 border-2 border-amber-400 rounded-2xl text-2xl font-bold text-amber-950 flex flex-col items-center justify-center shadow-sm active:scale-95 transition">
+                    <span>ㅡ</span>
+                    <span class="text-[10px] text-amber-700 font-normal">땅</span>
+                </button>
+                <button onclick="addVowelElement('ㅣ')" class="w-16 h-16 bg-amber-100 hover:bg-amber-200 border-2 border-amber-400 rounded-2xl text-2xl font-bold text-amber-950 flex flex-col items-center justify-center shadow-sm active:scale-95 transition">
+                    <span>ㅣ</span>
+                    <span class="text-[10px] text-amber-700 font-normal">사람</span>
+                </button>
+            </div>
+
+            <!-- Selected Elements Container -->
+            <div class="flex justify-center items-center gap-2 mb-6">
+                <span class="text-sm text-gray-500">내가 선택한 기호:</span>
+                <div id="selected-vowels" class="min-w-[120px] h-10 bg-white border-2 border-dashed border-amber-300 rounded-lg flex items-center justify-center px-3 text-lg font-bold text-amber-900 tracking-widest">
+                    (선택 대기)
+                </div>
+                <button onclick="resetVowelSelection()" class="text-xs text-gray-500 underline hover:text-red-500 ml-2">다시하기</button>
+            </div>
+
+            <div class="text-center">
+                <p class="text-sm font-bold text-amber-800">완성된 단계: <span id="vowel-score">0</span> / 3</p>
+            </div>
+        </div>
+
+        <!-- Stage 3: Final Consonant Reuse (종성부용초성) -->
+        <div id="stage-3" class="hanji-card rounded-2xl p-6 sm:p-8 hidden">
+            <div class="flex justify-between items-center border-b pb-3 mb-4 border-amber-200">
+                <span class="bg-amber-200 text-amber-900 text-xs font-bold px-3 py-1 rounded-full">3단계: 받침의 지혜</span>
+                <span class="text-sm font-semibold text-gray-600">첫소리 글자(초성) 재사용하기!</span>
+            </div>
+
+            <p class="text-center font-bold text-base sm:text-lg mb-2 text-amber-900">
+                💡 새로운 글자를 만들 필요가 없어요!<br>
+                <span class="text-amber-700">위쪽에서 쓰인 첫소리 글자(초성)를 찾아 아래 받침으로 넣고 단어를 완성하세요!</span>
+            </p>
+
+            <!-- Word Completion Display -->
+            <div class="bg-amber-50 p-6 rounded-xl my-4 text-center border-2 border-amber-200 relative">
+                <p id="word-hint-text" class="text-sm font-bold text-amber-800 mb-2">"알록달록 아름다운 '꽃밭'"</p>
+                
+                <div class="flex items-center justify-center gap-4 my-3">
+                    <!-- Word with missing batchim -->
+                    <div class="bg-white px-6 py-4 rounded-xl border-2 border-amber-400 shadow-inner flex items-center justify-center min-w-[120px]">
+                        <span id="word-prefix-display" class="text-4xl font-extrabold text-gray-800 font-batang">꼬</span>
+                        <div id="target-drop-zone" class="w-12 h-12 ml-2 border-2 border-dashed border-amber-500 rounded-lg flex items-center justify-center bg-amber-100 text-2xl font-bold text-amber-900 font-batang transition-all duration-300">
+                            ?
+                        </div>
+                    </div>
+                    <span class="text-2xl font-bold text-amber-800">+</span>
+                    <span id="word-suffix-display" class="text-4xl font-extrabold text-gray-800 font-batang">밭</span>
+                </div>
+            </div>
+
+            <!-- Choice Cards (Consonants) -->
+            <div class="text-center mb-2">
+                <p class="text-xs text-gray-500 font-semibold">알맞은 첫소리(초성) 글자 카드를 선택하세요!</p>
+            </div>
+            <div id="final-consonant-options" class="flex flex-wrap justify-center gap-3 my-4">
+                <!-- Option buttons generated dynamically -->
+            </div>
+
+            <div id="stage3-feedback" class="hidden my-2 p-3 bg-amber-100 rounded-lg text-sm text-center font-bold"></div>
+        </div>
+
+        <!-- Stage 4: Outro / Certificate -->
+        <div id="stage-outro" class="hanji-card rounded-2xl p-6 sm:p-10 text-center hidden relative overflow-hidden">
+            <div class="seal-stamp my-2">
+                <div class="inline-block p-4 border-4 border-red-700 rounded-full text-red-700 font-batang font-extrabold text-2xl bg-red-50 transform -rotate-12">
+                    훈민정음<br>해례본 완료
+                </div>
+            </div>
+
+            <h2 class="text-2xl sm:text-3xl font-extrabold font-batang text-amber-950 mt-4 mb-2">
+                🎉 축하합니다! 자랑스러운 집현전 학사!
+            </h2>
+            
+            <!-- Final Score Display Box -->
+            <div class="bg-amber-100/80 border-2 border-amber-300 rounded-2xl p-4 my-4 max-w-md mx-auto shadow-sm">
+                <p class="text-xs text-amber-800 font-bold mb-1">최종 탐험 점수</p>
+                <p class="text-4xl font-black text-amber-900 font-batang" id="final-score-display">0 / 100점</p>
+                <p class="text-sm font-bold text-amber-700 mt-2" id="final-grade-badge">🎓 집현전 최고 학사</p>
+            </div>
+
+            <p class="text-gray-700 leading-relaxed text-sm sm:text-base max-w-lg mx-auto mb-6">
+                훈민정음의 3가지 위대한 과학적 비밀을 모두 풀어내었습니다.<br>
+                <span class="font-bold text-amber-900">발음 기관 모양(초성)</span> + <span class="font-bold text-amber-900">천지인 원리(중성)</span> + <span class="font-bold text-amber-900">초성 재사용의 효율성(종성)</span>으로 만들어진 한글은 세상을 밝힌 최고의 글자입니다!
+            </p>
+
+            <div class="bg-amber-50 p-4 rounded-xl border border-amber-300 text-left mb-6 max-w-md mx-auto text-xs sm:text-sm space-y-2">
+                <p class="font-bold text-amber-900 border-b border-amber-300 pb-1">✨ 배운 내용 정리</p>
+                <p>1. <b>상형의 원리:</b> 자음은 사람의 발음 기관 모양을 본떴어요.</p>
+                <p>2. <b>천지인 원리:</b> 모음은 하늘(ㆍ), 땅(ㅡ), 사람(ㅣ)의 조합이에요.</p>
+                <p>3. <b>종성부용초성:</b> 받침 문자를 따로 만들지 않아 배우기 정말 쉽답니다.</p>
+            </div>
+
+            <button onclick="startGame()" class="bg-amber-800 hover:bg-amber-900 text-white font-bold text-lg px-8 py-3 rounded-xl shadow-lg transition transform hover:scale-105">
+                <i class="fa-solid fa-rotate-right mr-2"></i>다시 도전하기
+            </button>
+        </div>
+    </main>
+
+    <footer class="text-center text-xs text-gray-500 my-4">
+        세종대왕의 훈민정음 반포 (1446년) | 초등 5학년 국어/사회 연계 미니게임
+    </footer>
+
+    <script>
+        // Game State Variables
+        let currentStage = 0;
+        let totalScore = 0;
+
+        /*
+           Total Max Score: 100 Points
+           - Stage 1: 5 pairs * 8 points = 40 points
+           - Stage 2: 3 questions * 10 points = 30 points
+           - Stage 3: 3 questions * 10 points = 30 points
+        */
+
+        // Stage 1 Data
+        const stage1Data = [
+            { id: 'k', consonant: 'ㄱ', name: '혀뿌리가 목구멍을 막는 모양', icon: '👅' },
+            { id: 'n', consonant: 'ㄴ', name: '혀끝이 윗잇몸에 붙는 모양', icon: '🦷' },
+            { id: 'm', consonant: 'ㅁ', name: '입술의 모양', icon: '👄' },
+            { id: 's', consonant: 'ㅅ', name: '이(치아)의 모양', icon: '😬' },
+            { id: 'o', consonant: 'ㅇ', name: '목구멍의 모양', icon: '😮' }
+        ];
+
+        let selectedConsonant = null;
+        let selectedOrgan = null;
+        let stage1Connections = {};
+
+        // Stage 2 Data
+        const stage2Data = [
+            { target: 'ㅏ', req: ['ㅣ', 'ㆍ'], hint: '사람(ㅣ)의 오른쪽에 하늘(ㆍ)!' },
+            { target: 'ㅗ', req: ['ㆍ', 'ㅡ'], hint: '땅(ㅡ)의 위에 하늘(ㆍ)!' },
+            { target: 'ㅜ', req: ['ㅡ', 'ㆍ'], hint: '땅(ㅡ)의 아래에 하늘(ㆍ)!' }
+        ];
+        let currentVowelIdx = 0;
+        let userVowelSelection = [];
+
+        // Stage 3 Data
+        const stage3Data = [
+            { prefix: '다', suffix: '님', targetConsonant: 'ㄹ', fullName: '달님', hint: '밤하늘을 밝게 비추는 "달님"', explain: '‘ㄹ’은 [라면]의 첫소리이지만, [달]의 받침으로도 그대로 쓰여요!' },
+            { prefix: '꼬', suffix: '밭', targetConsonant: 'ㅊ', fullName: '꽃밭', hint: '알록달록 아름다운 "꽃밭"', explain: '‘ㅊ’은 [치마]의 첫소리이지만, [꽃]의 받침으로도 그대로 쓰여요!' },
+            { prefix: '가', suffix: '물', targetConsonant: 'ㅇ', fullName: '강물', hint: '시원하게 흘러가는 "강물"', explain: '‘ㅇ’은 [아기]의 첫소리이지만, [강]의 받침으로도 그대로 쓰여요!' }
+        ];
+        let currentWordIdx = 0;
+
+        function updateScoreDisplay() {
+            document.getElementById('live-score').innerText = totalScore;
+        }
+
+        // Update Progress Bar & Stage Title
+        function updateProgress(stage) {
+            const bar = document.getElementById('progress-bar');
+            const indicator = document.getElementById('stage-indicator');
+
+            if (stage === 0) {
+                bar.style.width = '0%';
+                indicator.innerText = '탐험 준비 중';
+            } else if (stage === 1) {
+                bar.style.width = '33%';
+                indicator.innerText = '1단계: 초성 탐험 중';
+            } else if (stage === 2) {
+                bar.style.width = '66%';
+                indicator.innerText = '2단계: 중성 탐험 중';
+            } else if (stage === 3) {
+                bar.style.width = '100%';
+                indicator.innerText = '3단계: 종성 탐험 중';
+            }
+        }
+
+        // Navigation Engine
+        function showStage(stageNum) {
+            currentStage = stageNum;
+            for (let i = 0; i <= 3; i++) {
+                const stageEl = document.getElementById(`stage-${i}`);
+                if (stageEl) stageEl.classList.add('hidden');
+            }
+            document.getElementById('stage-outro').classList.add('hidden');
+
+            if (stageNum === 'outro') {
+                document.getElementById('stage-outro').classList.remove('hidden');
+                updateProgress(3);
+                showFinalResults();
+            } else {
+                document.getElementById(`stage-${stageNum}`).classList.remove('hidden');
+                updateProgress(stageNum);
+            }
+        }
+
+        function startGame() {
+            totalScore = 0;
+            updateScoreDisplay();
+            showStage(1);
+            initStage1();
+        }
+
+        // --- STAGE 1 LOGIC ---
+        function initStage1() {
+            stage1Connections = {};
+            selectedConsonant = null;
+            selectedOrgan = null;
+
+            const consonantList = document.getElementById('consonant-list');
+            const organList = document.getElementById('organ-list');
+
+            // Render Consonants
+            consonantList.innerHTML = stage1Data.map(item => `
+                <button onclick="selectConsonant('${item.id}')" id="c-${item.id}" 
+                    class="w-full text-left p-3 rounded-xl border-2 border-amber-200 bg-white hover:bg-amber-50 font-bold text-amber-900 flex items-center justify-between transition">
+                    <span class="text-2xl font-batang">${item.consonant}</span>
+                    <span id="c-status-${item.id}" class="text-xs text-amber-600 font-normal">선택 안 됨</span>
+                </button>
+            `).join('');
+
+            // Shuffle Organs for fair challenge
+            const shuffledOrgans = [...stage1Data].sort(() => Math.random() - 0.5);
+
+            // Render Organs
+            organList.innerHTML = shuffledOrgans.map(item => `
+                <button onclick="selectOrgan('${item.id}')" id="o-${item.id}" 
+                    class="w-full text-left p-3 rounded-xl border-2 border-amber-200 bg-white hover:bg-amber-50 text-sm font-semibold text-gray-700 flex items-center justify-between transition">
+                    <span>${item.icon} ${item.name}</span>
+                    <span id="o-status-${item.id}" class="text-xs text-amber-600 font-normal"></span>
+                </button>
+            `).join('');
+        }
+
+        function selectConsonant(id) {
+            selectedConsonant = id;
+            stage1Data.forEach(item => {
+                const btn = document.getElementById(`c-${item.id}`);
+                if (item.id === id) {
+                    btn.classList.add('border-amber-600', 'bg-amber-100');
+                } else {
+                    btn.classList.remove('border-amber-600', 'bg-amber-100');
+                }
+            });
+            tryPairStage1();
+        }
+
+        function selectOrgan(id) {
+            selectedOrgan = id;
+            stage1Data.forEach(item => {
+                const btn = document.getElementById(`o-${item.id}`);
+                if (item.id === id) {
+                    btn.classList.add('border-amber-600', 'bg-amber-100');
+                } else {
+                    btn.classList.remove('border-amber-600', 'bg-amber-100');
+                }
+            });
+            tryPairStage1();
+        }
+
+        function tryPairStage1() {
+            if (selectedConsonant && selectedOrgan) {
+                stage1Connections[selectedConsonant] = selectedOrgan;
+
+                const oObj = stage1Data.find(d => d.id === selectedOrgan);
+                document.getElementById(`c-status-${selectedConsonant}`).innerText = `🔗 ${oObj.icon}`;
+
+                selectedConsonant = null;
+                selectedOrgan = null;
+
+                stage1Data.forEach(item => {
+                    document.getElementById(`c-${item.id}`).classList.remove('border-amber-600', 'bg-amber-100');
+                    document.getElementById(`o-${item.id}`).classList.remove('border-amber-600', 'bg-amber-100');
+                });
+            }
+        }
+
+        function checkStage1() {
+            let stage1Score = 0;
+            let correctCount = 0;
+
+            stage1Data.forEach(item => {
+                if (stage1Connections[item.id] === item.id) {
+                    correctCount++;
+                    stage1Score += 8; // 8 pts each -> Max 40
+                }
+            });
+
+            totalScore += stage1Score;
+            updateScoreDisplay();
+
+            const feedback = document.getElementById('stage1-feedback');
+            feedback.classList.remove('hidden');
+
+            feedback.className = "my-3 p-3 bg-amber-100 text-amber-900 border border-amber-300 rounded-lg text-sm text-center font-bold";
+            feedback.innerHTML = `총 ${stage1Data.length}개 중 <b>${correctCount}개</b> 정답! (+${stage1Score}점 획득)<br>다음 단계로 이동합니다!`;
+
+            setTimeout(() => {
+                showStage(2);
+                initStage2();
+            }, 1800);
+        }
+
+        // --- STAGE 2 LOGIC ---
+        function initStage2() {
+            currentVowelIdx = 0;
+            loadVowelChallenge();
+        }
+
+        function loadVowelChallenge() {
+            userVowelSelection = [];
+            const data = stage2Data[currentVowelIdx];
+            document.getElementById('target-vowel').innerText = data.target;
+            document.getElementById('vowel-hint').innerText = data.hint;
+            document.getElementById('vowel-score').innerText = currentVowelIdx;
+            updateVowelDisplay();
+        }
+
+        function addVowelElement(char) {
+            if (userVowelSelection.length < 2) {
+                userVowelSelection.push(char);
+                updateVowelDisplay();
+                if (userVowelSelection.length === 2) {
+                    checkVowelCombination();
+                }
+            }
+        }
+
+        function resetVowelSelection() {
+            userVowelSelection = [];
+            updateVowelDisplay();
+        }
+
+        function updateVowelDisplay() {
+            const container = document.getElementById('selected-vowels');
+            if (userVowelSelection.length === 0) {
+                container.innerText = "(선택 대기)";
+            } else {
+                container.innerText = userVowelSelection.join(' + ');
+            }
+        }
+
+        function checkVowelCombination() {
+            const data = stage2Data[currentVowelIdx];
+            const isCorrect = userVowelSelection.every((val, index) => val === data.req[index]);
+
+            const container = document.getElementById('selected-vowels');
+
+            if (isCorrect) {
+                totalScore += 10; // 10 pts each -> Max 30
+                updateScoreDisplay();
+                container.className = "min-w-[120px] h-10 bg-green-100 border-2 border-green-500 text-green-900 font-bold rounded-lg flex items-center justify-center px-3 text-lg";
+            } else {
+                container.className = "min-w-[120px] h-10 bg-red-100 border-2 border-red-400 text-red-800 font-bold rounded-lg flex items-center justify-center px-3 text-lg";
+            }
+
+            setTimeout(() => {
+                container.className = "min-w-[120px] h-10 bg-white border-2 border-dashed border-amber-300 rounded-lg flex items-center justify-center px-3 text-lg font-bold text-amber-900 tracking-widest";
+                currentVowelIdx++;
+                if (currentVowelIdx >= stage2Data.length) {
+                    showStage(3);
+                    initStage3();
+                } else {
+                    loadVowelChallenge();
+                }
+            }, 1000);
+        }
+
+        // --- STAGE 3 LOGIC ---
+        function initStage3() {
+            currentWordIdx = 0;
+            loadWordChallenge();
+        }
+
+        function loadWordChallenge() {
+            const data = stage3Data[currentWordIdx];
+            document.getElementById('word-prefix-display').innerText = data.prefix;
+            document.getElementById('word-suffix-display').innerText = data.suffix;
+            
+            const dropZone = document.getElementById('target-drop-zone');
+            dropZone.innerText = '?';
+            dropZone.className = "w-12 h-12 ml-2 border-2 border-dashed border-amber-500 rounded-lg flex items-center justify-center bg-amber-100 text-2xl font-bold text-amber-900 font-batang transition-all duration-300";
+
+            document.getElementById('word-hint-text').innerText = data.hint;
+            document.getElementById('stage3-feedback').classList.add('hidden');
+
+            const optionsContainer = document.getElementById('final-consonant-options');
+            const candidates = ['ㄹ', 'ㄴ', 'ㅊ', 'ㅇ', 'ㅁ', 'ㄱ', 'ㅂ', 'ㅅ'].sort(() => Math.random() - 0.5);
+
+            optionsContainer.innerHTML = candidates.map(c => `
+                <button onclick="selectFinalConsonant('${c}')" 
+                    class="w-14 h-14 bg-white hover:bg-amber-100 border-2 border-amber-400 rounded-xl font-batang text-2xl font-bold text-amber-900 shadow-md active:scale-95 transition transform hover:-translate-y-1">
+                    ${c}
+                </button>
+            `).join('');
+        }
+
+        function selectFinalConsonant(char) {
+            const data = stage3Data[currentWordIdx];
+            const dropZone = document.getElementById('target-drop-zone');
+            const feedback = document.getElementById('stage3-feedback');
+
+            // Disable buttons temporarily during animation
+            const buttons = document.querySelectorAll('#final-consonant-options button');
+            buttons.forEach(b => b.disabled = true);
+
+            dropZone.innerText = char;
+
+            if (char === data.targetConsonant) {
+                totalScore += 10; // 10 pts each -> Max 30
+                updateScoreDisplay();
+
+                dropZone.className = "w-12 h-12 ml-2 border-2 border-green-600 bg-green-100 text-green-900 rounded-lg flex items-center justify-center text-2xl font-bold font-batang transform scale-110 transition-all duration-300";
+                
+                feedback.classList.remove('hidden');
+                feedback.className = "my-2 p-3 bg-green-100 text-green-900 border border-green-300 rounded-lg text-sm text-center font-bold";
+                feedback.innerHTML = `✨ 정답! (+10점)<br><b>${data.explain}</b>`;
+            } else {
+                dropZone.className = "w-12 h-12 ml-2 border-2 border-red-500 bg-red-100 text-red-700 rounded-lg flex items-center justify-center text-2xl font-bold font-batang animate-bounce";
+                
+                feedback.classList.remove('hidden');
+                feedback.className = "my-2 p-3 bg-red-100 text-red-800 border border-red-300 rounded-lg text-sm text-center font-bold";
+                feedback.innerHTML = `아쉬워요! 정답은 '<b>${data.targetConsonant}</b>' 입니다.<br><b>${data.explain}</b>`;
+            }
+
+            currentWordIdx++;
+
+            setTimeout(() => {
+                if (currentWordIdx >= stage3Data.length) {
+                    showStage('outro');
+                } else {
+                    loadWordChallenge();
+                }
+            }, 2000);
+        }
+
+        // Show Final Score and Grade in Outro
+        function showFinalResults() {
+            document.getElementById('final-score-display').innerText = `${totalScore} / 100점`;
+            
+            const gradeBadge = document.getElementById('final-grade-badge');
+            if (totalScore >= 90) {
+                gradeBadge.innerText = '🥇 집현전 최고 으뜸 학사';
+                gradeBadge.className = 'text-sm font-bold text-amber-800 bg-amber-200 px-3 py-1 rounded-full inline-block mt-2';
+            } else if (totalScore >= 70) {
+                gradeBadge.innerText = '🥈 자랑스러운 집현전 성실 학사';
+                gradeBadge.className = 'text-sm font-bold text-amber-800 bg-amber-100 px-3 py-1 rounded-full inline-block mt-2';
+            } else {
+                gradeBadge.innerText = '🥉 한글에 첫발을 디딘 꿈나무 학사';
+                gradeBadge.className = 'text-sm font-bold text-amber-700 bg-amber-50 px-3 py-1 rounded-full inline-block mt-2';
+            }
+        }
+    </script>
+</body>
+</html>
